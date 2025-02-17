@@ -23,8 +23,8 @@ use crate::files::{
 };
 use crate::lock::Lock;
 use crate::logger::Logger;
-use crate::shell::{run_shell_command_by_os, Command};
-use crate::{format_one_arg, format_three_args, format_two_args};
+use crate::shell::Command;
+use crate::{format_one_arg, format_three_args, format_two_args, run_shell_command_with_log};
 use anyhow::Error;
 use reqwest::Client;
 use std::fs;
@@ -42,7 +42,7 @@ const FFMPEG_RECORD_FRAME_RATE: &str = "30";
 const FFMPEG_RECORD_DESKTOP_WINDOWS_COMMAND: &str = "{} -f gdigrab -i desktop -r {} -q:v 1 -y {}";
 const FFMPEG_RECORD_DESKTOP_LINUX_COMMAND: &str =
     "{} -f x11grab -i $DISPLAY -r {} -vcodec huffyuv -y {}";
-const FFMPEG_RECORD_DESKTOP_MACOS_COMMAND: &str = "{} -f avfoundation -i \"1\" -r {} -y {}";
+const FFMPEG_RECORD_DESKTOP_MACOS_COMMAND: &str = "{} -f avfoundation -i $DISPLAY -r {} -y {}";
 const FFMPEG_RECORDING_EXTENSION: &str = "avi";
 const FFMPEG_RECORDING_FOLDER: &str = "recordings";
 
@@ -213,6 +213,6 @@ pub fn record_desktop_with_ffmpeg(
         FFMPEG_RECORD_FRAME_RATE,
         &recording_name,
     ));
-    run_shell_command_by_os(os, command).unwrap();
+    run_shell_command_with_log(log, os, command).unwrap();
     Ok(())
 }

@@ -206,5 +206,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: recordings-macos
-          path: /home/runner/.cache/selenium/recordings/*.avi
+          path: /Users/runner/.cache/selenium/recordings/*.avi
           retention-days: 6
