@@ -145,7 +145,7 @@ jobs:
         with:
           bazelrc: common --color=yes
       - name: Setup Fluxbox and Xvfb
-        if: inputs.os == 'ubuntu'
+        if: inputs.os == 'ubuntu' && (inputs.browser != '' || inputs.save-recordings)
         run: |
           sudo apt-get -y install fluxbox
           Xvfb :99 &
