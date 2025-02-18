@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-use crate::config::OS::{MACOS, WINDOWS};
+use crate::config::OS::{LINUX, MACOS, WINDOWS};
 use crate::downloads::download_to_tmp_folder;
 use crate::files::{
     compose_driver_path_in_cache, create_parent_path_if_not_exists, get_filename_with_extension,
@@ -44,7 +44,7 @@ const FFMPEG_MACOS_RELEASE_URL: &str = "https://evermeet.cx/ffmpeg/ffmpeg-{}.zip
 const FFMPEG_RECORD_FRAME_RATE: &str = "30";
 const FFMPEG_RECORD_DESKTOP_WINDOWS_COMMAND: &str = "{} -f gdigrab -i desktop -r {} -q:v 1 -y {}";
 const FFMPEG_RECORD_DESKTOP_LINUX_COMMAND: &str = "{} -f x11grab -i {} -r {} -vcodec huffyuv -y {}";
-const FFMPEG_RECORD_DESKTOP_MACOS_COMMAND: &str = r#"{} -f avfoundation -i "{}:0" -r {} -y {}"#;
+const FFMPEG_RECORD_DESKTOP_MACOS_COMMAND: &str = r#"{} -f avfoundation -i "1:0" -r {} -y {}"#;
 const FFMPEG_RECORDING_EXTENSION: &str = "avi";
 const FFMPEG_RECORDING_FOLDER: &str = "recordings";
 const FFMPEG_DEFAULT_DISPLAY: &str = ":0";
@@ -210,19 +210,19 @@ pub fn record_desktop_with_ffmpeg(
         "Recording desktop with {} to {}",
         FFMPEG_NAME, &recording_name
     ));
-    let command = if WINDOWS.is(os) {
-        Command::new_single(format_three_args(
-            get_recording_command(os),
-            &path_to_string(&ffmpeg_path),
-            FFMPEG_RECORD_FRAME_RATE,
-            &recording_name,
-        ))
-    } else {
+    let command = if LINUX.is(os) {
         let env_display = env::var(ENV_DISPLAY).unwrap_or(FFMPEG_DEFAULT_DISPLAY.to_string());
         Command::new_single(format_four_args(
             get_recording_command(os),
             &path_to_string(&ffmpeg_path),
             &env_display,
+            FFMPEG_RECORD_FRAME_RATE,
+            &recording_name,
+        ))
+    } else {
+        Command::new_single(format_three_args(
+            get_recording_command(os),
+            &path_to_string(&ffmpeg_path),
             FFMPEG_RECORD_FRAME_RATE,
             &recording_name,
         ))
