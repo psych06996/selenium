@@ -1,0 +1,50 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+import time
+
+# Setup WebDriver (Ensure you have the correct driver installed, e.g., chromedriver or geckodriver)
+driver = webdriver.Chrome()
+driver.get("https://luckybird.io/")
+time.sleep(5)  # Allow time for the page to load
+
+def get_safe_column():
+    try:
+        # Extract safe column data from localStorage (assumes JavaScript bot is running)
+        safe_column = driver.execute_script("return localStorage.getItem('nightmareTowerData');")
+        if safe_column:
+            print("Safe Column Data:", safe_column)
+            return int(safe_column)
+    except Exception as e:
+        print("Error retrieving safe column:", e)
+    return None
+
+def click_safe_column():
+    try:
+        columns = driver.find_elements(By.CLASS_NAME, "tower-column")  # Adjust selector if needed
+        safe_index = get_safe_column()
+        
+        if safe_index is not None and 0 <= safe_index < len(columns):
+            ActionChains(driver).move_to_element(columns[safe_index]).click().perform()
+            print(f"Clicked column {safe_index}")
+            time.sleep(1)  # Wait before next move
+    except Exception as e:
+        print("Error clicking safe column:", e)
+
+def start_game():
+    try:
+        play_button = driver.find_element(By.CLASS_NAME, "play-button")  # Adjust selector
+        play_button.click()
+        print("Game started")
+        time.sleep(3)
+    except Exception as e:
+        print("Error starting game:", e)
+
+# Main game loop
+start_game()
+for _ in range(9):  # Adjust for number of rows
+    click_safe_column()
+    time.sleep(2)  # Delay between moves
+
+print("Game automation complete.")
+driver.quit()
